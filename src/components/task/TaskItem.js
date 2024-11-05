@@ -1,16 +1,15 @@
 import { format, isToday, isYesterday } from 'date-fns';
-import { Check, Clock, Edit, Repeat, Save, X } from 'lucide-react';
+import { Calendar, Check, Clock, Edit, GripVertical, Repeat, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { PRIORITY_LEVELS, RECURRENCE_PATTERNS } from '../../constants/taskConstants';
 import { DeleteConfirmDialog } from '../common/DeleteConfirmDialog';
-import { PrioritySelect } from './components/PrioritySelect';
-import { RecurrenceSelect } from './components/RecurrenceSelect';
 import { TagInput } from './components/TagInput';
 
 const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
 
   const startEditing = () => {
     setEditedTask({...task});
@@ -43,6 +42,14 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
     }));
   };
 
+  const clearTime = (e) => {
+    e.preventDefault();
+    setEditedTask(prev => ({
+      ...prev,
+      dueTime: ''
+    }));
+  };
+
   const currentStatus = task.status;
   const isCompleted = currentStatus === 'completed';
   const isOverdue = currentStatus === 'overdue';
@@ -51,103 +58,156 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-            <input
-              type="text"
-              value={editedTask.title}
-              onChange={(e) => setEditedTask({...editedTask, title: e.target.value})}
-              className="w-full p-2.5 rounded-lg border border-gray-300"
-            />
-          </div>
+          <input
+            type="text"
+            value={editedTask.title}
+            placeholder="Enter task title"
+            onChange={(e) => setEditedTask({...editedTask, title: e.target.value})}
+            className="w-full p-2 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors h-[38px]"
+          />
           
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Details</label>
-            <input
-              type="text"
+          <div className="relative">
+            <textarea
+              placeholder="Enter task details"
+              className={`w-full p-2 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors resize-none ${isDetailsExpanded ? 'h-24' : 'h-[38px]'}`}
               value={editedTask.details || ''}
               onChange={(e) => setEditedTask({...editedTask, details: e.target.value})}
-              className="w-full p-2.5 rounded-lg border border-gray-300"
             />
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
+              onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
+              aria-label="Expand details"
+            >
+              <GripVertical size={16} />
+            </button>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
-            <TagInput
-              tags={editedTask.tags || []}
-              setTags={(tags) => setEditedTask({...editedTask, tags})}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-            <PrioritySelect
-              value={editedTask.priority || 'medium'}
-              onChange={(value) => setEditedTask({...editedTask, priority: value})}
-            />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-[1.5fr,1.5fr,200px] gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-              <div className="relative">
+              <div className="relative flex items-center">
                 <input
                   type="date"
+                  className="sr-only"
                   value={editedTask.dueDate || ''}
                   onChange={(e) => setEditedTask({...editedTask, dueDate: e.target.value})}
-                  className="w-full p-2.5 pr-8 rounded-lg border border-gray-300"
                 />
-                {editedTask.dueDate && (
+                <div 
+                  className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
+                  onClick={() => document.querySelector('input[type="date"]').showPicker()}
+                >
+                  <span className="flex-grow">
+                    {editedTask.dueDate ? formatDate(editedTask.dueDate) : ''}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    {editedTask.dueDate && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          clearDate(e);
+                        }}
+                        type="button"
+                        className="p-1 hover:bg-gray-100 rounded-full"
+                      >
+                        <X size={16} className="text-gray-500" />
+                      </button>
+                    )}
+                    <Calendar size={16} className="text-gray-500" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <input
+                type="time"
+                placeholder="--:-- --"
+                className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors pr-16"
+                value={editedTask.dueTime || ''}
+                onChange={(e) => setEditedTask({...editedTask, dueTime: e.target.value})}
+                disabled={!editedTask.dueDate}
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                {editedTask.dueTime && (
                   <button
-                    onClick={clearDate}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full"
+                    onClick={clearTime}
                     type="button"
+                    className="p-1 hover:bg-gray-100 rounded-full"
                   >
                     <X size={16} className="text-gray-500" />
                   </button>
                 )}
+                <Clock size={16} className="text-gray-500" />
               </div>
             </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
-              <input
-                type="time"
-                value={editedTask.dueTime || ''}
-                onChange={(e) => setEditedTask({...editedTask, dueTime: e.target.value})}
-                className="w-full p-2.5 rounded-lg border border-gray-300"
-                disabled={!editedTask.dueDate}
-              />
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Repeat</label>
-              <RecurrenceSelect
-                value={editedTask.recurrence || 'none'}
-                onChange={(value) => setEditedTask({...editedTask, recurrence: value})}
-              />
+            <select
+              value={editedTask.recurrence || 'none'}
+              onChange={(e) => setEditedTask({...editedTask, recurrence: e.target.value})}
+              className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors bg-white"
+            >
+              <option value="none">No repeat</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+
+          <div className="grid grid-cols-[1fr,200px] gap-4">
+            <TagInput
+              tags={editedTask.tags || []}
+              setTags={(tags) => setEditedTask({...editedTask, tags})}
+            />
+            
+            <div className="flex gap-2 items-center h-[38px]">
+              {['High', 'Medium', 'Low'].map((priority) => (
+                <button
+                  key={priority}
+                  type="button"
+                  onClick={() => {
+                    if (editedTask.priority === priority.toLowerCase()) {
+                      setEditedTask({...editedTask, priority: ''});
+                    } else {
+                      setEditedTask({...editedTask, priority: priority.toLowerCase()});
+                    }
+                  }}
+                  className={`px-3 py-1 rounded-full text-sm ${
+                    editedTask.priority === priority.toLowerCase()
+                      ? priority === 'High'
+                        ? 'bg-red-50 text-red-700'
+                        : priority === 'Medium'
+                        ? 'bg-yellow-50 text-yellow-700'
+                        : 'bg-green-50 text-green-700'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {priority}
+                </button>
+              ))}
             </div>
           </div>
           
-          <div className="flex justify-end gap-2 mt-2">
-            <button
-              onClick={() => {
-                setEditedTask(task);
-                setIsEditing(false);
-              }}
-              className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              type="button"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
-              type="button"
-            >
-              <Save size={16} />
-              Save
-            </button>
+          <div className="grid grid-cols-[1fr,200px] gap-4">
+            <div /> {/* Empty div for grid alignment */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setEditedTask(task);
+                  setIsEditing(false);
+                }}
+                className="flex-1 h-[38px] bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                type="button"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="flex-1 h-[38px] bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                type="button"
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
       </div>

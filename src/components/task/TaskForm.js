@@ -1,9 +1,10 @@
-import { Calendar, ChevronDown, ChevronUp, Plus, X } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronUp, Clock, GripVertical, Plus, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { TagInput } from './components/TagInput';
 
 const TaskForm = ({ newTask, setNewTask, addTask }) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,37 +27,6 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
     return dateStr;
   };
 
-  const PrioritySelect = ({ value, onChange }) => {
-    return (
-      <div className="flex gap-2 h-[38px] items-center w-[200px]">
-        {['High', 'Medium', 'Low'].map((priority) => (
-          <button
-            key={priority}
-            type="button"
-            onClick={() => {
-              if (value === priority.toLowerCase()) {
-                onChange('');
-              } else {
-                onChange(priority.toLowerCase());
-              }
-            }}
-            className={`px-3 py-1 rounded-full text-sm ${
-              value === priority.toLowerCase()
-                ? priority === 'High'
-                  ? 'bg-red-50 text-red-700'
-                  : priority === 'Medium'
-                  ? 'bg-yellow-50 text-yellow-700'
-                  : 'bg-green-50 text-green-700'
-                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            {priority}
-          </button>
-        ))}
-      </div>
-    );
-  };
-
   const clearDate = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -67,9 +37,16 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
     }));
   };
 
+  const clearTime = (e) => {
+    e.preventDefault();
+    setNewTask(prev => ({
+      ...prev,
+      dueTime: ''
+    }));
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-      {/* Header with collapse button */}
       <div 
         className="px-6 py-4 flex justify-between items-center cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -87,124 +64,138 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
         </button>
       </div>
 
-      {/* Collapsible form content */}
       {isExpanded && (
         <form onSubmit={handleSubmit} className="px-6 pb-4">
           <div className="grid grid-cols-1 gap-4">
-            {/* Title field */}
             <input
               type="text"
               placeholder="Enter task title"
-              className="w-full p-2 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors"
+              className="w-full p-2 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors h-[38px]"
               value={newTask.title}
               onChange={(e) => setNewTask({...newTask, title: e.target.value})}
             />
             
-            {/* Details field */}
-            <textarea
-              placeholder="Enter task details"
-              rows={2}
-              className="w-full p-2 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors min-h-[38px] resize-y"
-              value={newTask.details}
-              onChange={(e) => setNewTask({...newTask, details: e.target.value})}
-            />
+            <div className="relative">
+              <textarea
+                placeholder="Enter task details"
+                className={`w-full p-2 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors resize-none ${isDetailsExpanded ? 'h-24' : 'h-[38px]'}`}
+                value={newTask.details}
+                onChange={(e) => setNewTask({...newTask, details: e.target.value})}
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
+                onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
+                aria-label="Expand details"
+              >
+                <GripVertical size={16} />
+              </button>
+            </div>
 
-            {/* Date, Time, and Repeat row */}
             <div className="grid grid-cols-[1.5fr,1.5fr,200px] gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Due Date
-                </label>
-                <div className="relative">
-                  <div className="relative flex items-center">
-                    <input
-                      type="date"
-                      className="sr-only"
-                      value={newTask.dueDate}
-                      onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
-                    />
-                    <div 
-                      className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
-                      onClick={() => document.querySelector('input[type="date"]').showPicker()}
-                    >
-                      <span className="flex-grow">
-                        {formatDisplayDate(newTask.dueDate)}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        {newTask.dueDate && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              clearDate(e);
-                            }}
-                            type="button"
-                            className="p-1 hover:bg-gray-100 rounded-full"
-                          >
-                            <X size={16} className="text-gray-500" />
-                          </button>
-                        )}
-                        <Calendar size={16} className="text-gray-500" />
-                      </div>
+                <div className="relative flex items-center">
+                  <input
+                    type="date"
+                    className="sr-only"
+                    value={newTask.dueDate}
+                    onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
+                  />
+                  <div 
+                    className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
+                    onClick={() => document.querySelector('input[type="date"]').showPicker()}
+                  >
+                    <span className="flex-grow">
+                      {formatDisplayDate(newTask.dueDate)}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      {newTask.dueDate && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            clearDate(e);
+                          }}
+                          type="button"
+                          className="p-1 hover:bg-gray-100 rounded-full"
+                        >
+                          <X size={16} className="text-gray-500" />
+                        </button>
+                      )}
+                      <Calendar size={16} className="text-gray-500" />
                     </div>
                   </div>
                 </div>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Due Time
-                </label>
+              <div className="relative">
                 <input
                   type="time"
                   placeholder="--:-- --"
-                  className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors"
+                  className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors pr-16"
                   value={newTask.dueTime}
                   onChange={(e) => setNewTask({...newTask, dueTime: e.target.value})}
                   disabled={!newTask.dueDate}
                 />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  {newTask.dueTime && (
+                    <button
+                      onClick={clearTime}
+                      type="button"
+                      className="p-1 hover:bg-gray-100 rounded-full"
+                    >
+                      <X size={16} className="text-gray-500" />
+                    </button>
+                  )}
+                  <Clock size={16} className="text-gray-500" />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Repeat
-                </label>
-                <select
-                  value={newTask.recurrence || 'none'}
-                  onChange={(e) => setNewTask({...newTask, recurrence: e.target.value})}
-                  className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors bg-white"
-                >
-                  <option value="none">No repeat</option>
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
-              </div>
+              <select
+                value={newTask.recurrence || 'none'}
+                onChange={(e) => setNewTask({...newTask, recurrence: e.target.value})}
+                className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors bg-white"
+              >
+                <option value="none">No repeat</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
             </div>
 
-            {/* Tags and Priority row */}
-            <div className="grid grid-cols-[1fr,200px] gap-4 items-start">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tags (projects dropdown)
-                </label>
-                <TagInput
-                  tags={newTask.tags || []}
-                  setTags={(tags) => setNewTask({...newTask, tags})}
-                />
-              </div>
+            <div className="grid grid-cols-[1fr,200px] gap-4">
+              <TagInput
+                tags={newTask.tags || []}
+                setTags={(tags) => setNewTask({...newTask, tags})}
+              />
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Priority
-                </label>
-                <PrioritySelect
-                  value={newTask.priority || ''}
-                  onChange={(value) => setNewTask({...newTask, priority: value})}
-                />
+              <div className="flex gap-2 items-center h-[38px]">
+                {['High', 'Medium', 'Low'].map((priority) => (
+                  <button
+                    key={priority}
+                    type="button"
+                    onClick={() => {
+                      if (newTask.priority === priority.toLowerCase()) {
+                        setNewTask({...newTask, priority: ''});
+                      } else {
+                        setNewTask({...newTask, priority: priority.toLowerCase()});
+                      }
+                    }}
+                    className={`px-3 py-1 rounded-full text-sm ${
+                      newTask.priority === priority.toLowerCase()
+                        ? priority === 'High'
+                          ? 'bg-red-50 text-red-700'
+                          : priority === 'Medium'
+                          ? 'bg-yellow-50 text-yellow-700'
+                          : 'bg-green-50 text-green-700'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {priority}
+                  </button>
+                ))}
               </div>
             </div>
             
-            {/* Add task button */}
             <div className="flex justify-end">
               <button
                 type="submit"
