@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Plus, X } from 'lucide-react';
+import { Calendar, ChevronDown, ChevronUp, Plus, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { TagInput } from './components/TagInput';
 
@@ -11,14 +11,35 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
     addTask();
   };
 
+  const formatDisplayDate = (dateStr) => {
+    if (!dateStr) return '';
+    
+    const today = new Date();
+    const inputDate = new Date(dateStr);
+    
+    today.setHours(0, 0, 0, 0);
+    inputDate.setHours(0, 0, 0, 0);
+    
+    if (inputDate.getTime() === today.getTime()) {
+      return 'Today';
+    }
+    return dateStr;
+  };
+
   const PrioritySelect = ({ value, onChange }) => {
     return (
-      <div className="flex gap-2 h-[42px] items-center w-[200px]">
+      <div className="flex gap-2 h-[38px] items-center w-[200px]">
         {['High', 'Medium', 'Low'].map((priority) => (
           <button
             key={priority}
             type="button"
-            onClick={() => onChange(priority.toLowerCase())}
+            onClick={() => {
+              if (value === priority.toLowerCase()) {
+                onChange('');
+              } else {
+                onChange(priority.toLowerCase());
+              }
+            }}
             className={`px-3 py-1 rounded-full text-sm ${
               value === priority.toLowerCase()
                 ? priority === 'High'
@@ -47,10 +68,10 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
       {/* Header with collapse button */}
       <div 
-        className="p-6 flex justify-between items-center cursor-pointer"
+        className="px-6 py-4 flex justify-between items-center cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <h2 className="text-xl font-semibold text-gray-800">Add task</h2>
@@ -68,35 +89,25 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
 
       {/* Collapsible form content */}
       {isExpanded && (
-        <form onSubmit={handleSubmit} className="px-6 pb-6">
-          <div className="grid grid-cols-1 gap-6">
+        <form onSubmit={handleSubmit} className="px-6 pb-4">
+          <div className="grid grid-cols-1 gap-4">
             {/* Title field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Title
-              </label>
-              <input
-                type="text"
-                placeholder="Enter task title"
-                className="w-full p-2.5 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors"
-                value={newTask.title}
-                onChange={(e) => setNewTask({...newTask, title: e.target.value})}
-              />
-            </div>
+            <input
+              type="text"
+              placeholder="Enter task title"
+              className="w-full p-2 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors"
+              value={newTask.title}
+              onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+            />
             
             {/* Details field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Details
-              </label>
-              <textarea
-                placeholder="Enter task details"
-                rows={3}
-                className="w-full p-2.5 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors resize-y"
-                value={newTask.details}
-                onChange={(e) => setNewTask({...newTask, details: e.target.value})}
-              />
-            </div>
+            <textarea
+              placeholder="Enter task details"
+              rows={2}
+              className="w-full p-2 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors min-h-[38px] resize-y"
+              value={newTask.details}
+              onChange={(e) => setNewTask({...newTask, details: e.target.value})}
+            />
 
             {/* Date, Time, and Repeat row */}
             <div className="grid grid-cols-[1.5fr,1.5fr,200px] gap-4">
@@ -105,23 +116,36 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
                   Due Date
                 </label>
                 <div className="relative">
-                  <input
-                    type="date"
-                    placeholder="mm/dd/yyyy"
-                    className="w-full h-10 pl-3 pr-12 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors appearance-none"
-                    value={newTask.dueDate}
-                    onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
-                  />
-                  <div className="absolute right-0 top-0 h-full flex items-center pr-2">
-                    {newTask.dueDate && (
-                      <button
-                        onClick={clearDate}
-                        type="button"
-                        className="p-1 hover:bg-gray-100 rounded-full mr-1"
-                      >
-                        <X size={16} className="text-gray-500" />
-                      </button>
-                    )}
+                  <div className="relative flex items-center">
+                    <input
+                      type="date"
+                      className="sr-only"
+                      value={newTask.dueDate}
+                      onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
+                    />
+                    <div 
+                      className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
+                      onClick={() => document.querySelector('input[type="date"]').showPicker()}
+                    >
+                      <span className="flex-grow">
+                        {formatDisplayDate(newTask.dueDate)}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {newTask.dueDate && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              clearDate(e);
+                            }}
+                            type="button"
+                            className="p-1 hover:bg-gray-100 rounded-full"
+                          >
+                            <X size={16} className="text-gray-500" />
+                          </button>
+                        )}
+                        <Calendar size={16} className="text-gray-500" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -133,7 +157,7 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
                 <input
                   type="time"
                   placeholder="--:-- --"
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors"
+                  className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors"
                   value={newTask.dueTime}
                   onChange={(e) => setNewTask({...newTask, dueTime: e.target.value})}
                   disabled={!newTask.dueDate}
@@ -147,7 +171,7 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
                 <select
                   value={newTask.recurrence || 'none'}
                   onChange={(e) => setNewTask({...newTask, recurrence: e.target.value})}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors bg-white"
+                  className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors bg-white"
                 >
                   <option value="none">No repeat</option>
                   <option value="daily">Daily</option>
@@ -174,7 +198,7 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
                   Priority
                 </label>
                 <PrioritySelect
-                  value={newTask.priority || 'medium'}
+                  value={newTask.priority || ''}
                   onChange={(value) => setNewTask({...newTask, priority: value})}
                 />
               </div>
@@ -184,7 +208,7 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="w-[200px] bg-neutral-light hover:bg-neutral-dark text-white px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                className="w-[200px] bg-neutral-light hover:bg-neutral-dark text-white h-[38px] rounded-lg flex items-center justify-center gap-2 transition-colors"
               >
                 <Plus size={20} />
                 Add task
