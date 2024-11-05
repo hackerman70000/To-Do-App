@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { Calendar, ChevronDown, ChevronUp, Clock, GripVertical, Plus, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { TagInput } from './components/TagInput';
@@ -14,17 +15,7 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
 
   const formatDisplayDate = (dateStr) => {
     if (!dateStr) return '';
-    
-    const today = new Date();
-    const inputDate = new Date(dateStr);
-    
-    today.setHours(0, 0, 0, 0);
-    inputDate.setHours(0, 0, 0, 0);
-    
-    if (inputDate.getTime() === today.getTime()) {
-      return 'Today';
-    }
-    return dateStr;
+    return format(new Date(dateStr), "d MMM yyyy");
   };
 
   const clearDate = (e) => {
@@ -84,7 +75,7 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
               />
               <button
                 type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
+                className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing" // Changed from 'top-1/2 -translate-y-1/2' to 'top-2'
                 onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
                 aria-label="Expand details"
               >

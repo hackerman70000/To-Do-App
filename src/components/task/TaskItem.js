@@ -30,7 +30,7 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
     if (isYesterday(date)) {
       return 'Yesterday';
     }
-    return format(date, "MMM d, yyyy");
+    return format(date, "d MMM yyyy");
   };
 
   const clearDate = (e) => {
@@ -75,7 +75,7 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
             />
             <button
               type="button"
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
+              className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing" // Changed from 'top-1/2 -translate-y-1/2' to 'top-2'
               onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
               aria-label="Expand details"
             >

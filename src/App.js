@@ -12,7 +12,7 @@ function App() {
     details: '',
     dueDate: new Date().toISOString().split('T')[0],
     dueTime: '',
-    priority: 'medium',
+    priority: '',
     tags: [],
     recurrence: 'none'
   });
