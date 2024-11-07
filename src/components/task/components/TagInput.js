@@ -21,11 +21,11 @@ export const TagInput = ({ tags, setTags }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-2 p-2 border rounded-lg bg-white">
+    <div className="flex flex-wrap gap-1.5 px-2 border rounded-md bg-white h-[34px] overflow-hidden items-center">
       {tags.map((tag, index) => (
         <span
           key={index}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-gray-100 text-sm"
+          className="inline-flex items-center gap-1 px-2 h-[22px] rounded-full bg-gray-100 text-xs"
         >
           {tag}
           <button
@@ -33,7 +33,7 @@ export const TagInput = ({ tags, setTags }) => {
             onClick={() => removeTag(tag)}
             className="hover:text-red-500"
           >
-            <X size={14} />
+            <X size={12} />
           </button>
         </span>
       ))}
@@ -43,7 +43,7 @@ export const TagInput = ({ tags, setTags }) => {
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={tags.length === 0 ? "Add tags..." : ""}
-        className="flex-1 min-w-[120px] outline-none bg-transparent"
+        className="flex-1 min-w-[60px] outline-none bg-transparent text-sm h-[22px]"
       />
     </div>
   );

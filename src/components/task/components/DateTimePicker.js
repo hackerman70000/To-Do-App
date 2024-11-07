@@ -138,7 +138,7 @@ export const DateTimePicker = ({
             onChange={(e) => onDateChange(e.target.value)}
           />
           <div 
-            className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
+            className="w-full h-[34px] px-3 rounded-md border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer text-sm"
             onClick={handleDateClick}
           >
             <span className={`flex-grow min-w-0 truncate ${isOverdue ? 'text-red-500' : ''}`}>
@@ -157,10 +157,10 @@ export const DateTimePicker = ({
                     onDateChange('');
                   }}
                 >
-                  <X size={16} className="text-gray-500" />
+                  <X size={14} className="text-gray-500" />
                 </button>
               )}
-              <Calendar size={16} className="text-gray-500" />
+              <Calendar size={14} className="text-gray-500" />
             </div>
           </div>
         </div>
@@ -168,7 +168,7 @@ export const DateTimePicker = ({
       
       <div className="relative min-w-[120px]" ref={timePickerRef}>
         <div 
-          className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
+          className="w-full h-[34px] px-3 rounded-md border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
           onClick={handleTimeClick}
         >
           <input
@@ -178,7 +178,7 @@ export const DateTimePicker = ({
             value={timeInput}
             onChange={handleTimeInputChange}
             onKeyDown={handleTimeInputKeyDown}
-            className="flex-grow min-w-0 bg-transparent outline-none cursor-pointer"
+            className="flex-grow min-w-0 bg-transparent outline-none cursor-pointer text-sm"
             maxLength={5}
           />
           <div className="flex items-center gap-1 flex-shrink-0">
@@ -194,17 +194,17 @@ export const DateTimePicker = ({
                 className="p-1 hover:bg-gray-100 rounded-full"
                 aria-label="Clear time"
               >
-                <X size={16} className="text-gray-500" />
+                <X size={14} className="text-gray-500" />
               </button>
             )}
-            <Clock size={16} className="text-gray-500" />
+            <Clock size={14} className="text-gray-500" />
           </div>
         </div>
         
         {showTimePicker && date && (
           <div 
             ref={timeListRef}
-            className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg"
+            className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg"
           >
             {generateTimeOptions().map((timeOption) => {
               const isClosestTimeOption = timeOption === closestTime;
@@ -213,7 +213,7 @@ export const DateTimePicker = ({
                   key={timeOption}
                   type="button"
                   data-time={timeOption}
-                  className={`w-full px-3 py-2 text-left hover:bg-gray-100 text-sm ${
+                  className={`w-full px-3 py-1.5 text-left hover:bg-gray-100 text-xs ${
                     isClosestTimeOption ? 'bg-gray-50 font-medium' : ''
                   }`}
                   onClick={() => {
