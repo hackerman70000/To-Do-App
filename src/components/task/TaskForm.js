@@ -1,6 +1,6 @@
-import { format } from 'date-fns';
-import { Calendar, ChevronDown, ChevronUp, Clock, GripVertical, Plus, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, GripVertical, Plus } from 'lucide-react';
 import React, { useState } from 'react';
+import { DateTimePicker } from './components/DateTimePicker';
 import { TagInput } from './components/TagInput';
 
 const TaskForm = ({ newTask, setNewTask, addTask }) => {
@@ -11,29 +11,6 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
     e.preventDefault();
     if (!newTask.title) return;
     addTask();
-  };
-
-  const formatDisplayDate = (dateStr) => {
-    if (!dateStr) return '';
-    return format(new Date(dateStr), "d MMM yyyy");
-  };
-
-  const clearDate = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setNewTask(prev => ({
-      ...prev,
-      dueDate: '',
-      dueTime: ''
-    }));
-  };
-
-  const clearTime = (e) => {
-    e.preventDefault();
-    setNewTask(prev => ({
-      ...prev,
-      dueTime: ''
-    }));
   };
 
   return (
@@ -75,7 +52,7 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
               />
               <button
                 type="button"
-                className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing" // Changed from 'top-1/2 -translate-y-1/2' to 'top-2'
+                className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
                 onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
                 aria-label="Expand details"
               >
@@ -83,63 +60,13 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
               </button>
             </div>
 
-            <div className="grid grid-cols-[1.5fr,1.5fr,200px] gap-4">
-              <div>
-                <div className="relative flex items-center">
-                  <input
-                    type="date"
-                    className="sr-only"
-                    value={newTask.dueDate}
-                    onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
-                  />
-                  <div 
-                    className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
-                    onClick={() => document.querySelector('input[type="date"]').showPicker()}
-                  >
-                    <span className="flex-grow">
-                      {formatDisplayDate(newTask.dueDate)}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      {newTask.dueDate && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            clearDate(e);
-                          }}
-                          type="button"
-                          className="p-1 hover:bg-gray-100 rounded-full"
-                        >
-                          <X size={16} className="text-gray-500" />
-                        </button>
-                      )}
-                      <Calendar size={16} className="text-gray-500" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="relative">
-                <input
-                  type="time"
-                  placeholder="--:-- --"
-                  className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors pr-16"
-                  value={newTask.dueTime}
-                  onChange={(e) => setNewTask({...newTask, dueTime: e.target.value})}
-                  disabled={!newTask.dueDate}
-                />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  {newTask.dueTime && (
-                    <button
-                      onClick={clearTime}
-                      type="button"
-                      className="p-1 hover:bg-gray-100 rounded-full"
-                    >
-                      <X size={16} className="text-gray-500" />
-                    </button>
-                  )}
-                  <Clock size={16} className="text-gray-500" />
-                </div>
-              </div>
+            <div className="grid grid-cols-[1fr,200px] gap-4">
+              <DateTimePicker
+                date={newTask.dueDate}
+                time={newTask.dueTime}
+                onDateChange={(date) => setNewTask({...newTask, dueDate: date})}
+                onTimeChange={(time) => setNewTask({...newTask, dueTime: time})}
+              />
 
               <select
                 value={newTask.recurrence || 'none'}

@@ -1,7 +1,7 @@
 import React from 'react';
 import TaskItem from './TaskItem';
 
-const TaskList = ({ tasks, toggleTaskStatus, deleteTask, updateDifficulty, updateTask }) => {
+const TaskList = ({ tasks, toggleTaskStatus, deleteTask, updateTask }) => {
   const sortedTasks = [...tasks].sort((a, b) => {
     if (a.status === 'completed' && b.status !== 'completed') return 1;
     if (a.status !== 'completed' && b.status === 'completed') return -1;
@@ -26,7 +26,6 @@ const TaskList = ({ tasks, toggleTaskStatus, deleteTask, updateDifficulty, updat
           task={task}
           toggleTaskStatus={toggleTaskStatus}
           deleteTask={deleteTask}
-          updateDifficulty={updateDifficulty}
           updateTask={updateTask}
         />
       ))}

@@ -1,9 +1,25 @@
-import { format, isToday, isYesterday } from 'date-fns';
-import { Calendar, Check, Clock, Edit, GripVertical, Repeat, X } from 'lucide-react';
+import { format, isToday, isTomorrow, isYesterday } from 'date-fns';
+import { Check, Clock, Edit, GripVertical, Repeat, X } from 'lucide-react';
 import React, { useState } from 'react';
 import { PRIORITY_LEVELS, RECURRENCE_PATTERNS } from '../../constants/taskConstants';
 import { DeleteConfirmDialog } from '../common/DeleteConfirmDialog';
+import { DateTimePicker } from './components/DateTimePicker';
 import { TagInput } from './components/TagInput';
+
+const formatDisplayDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isToday(date)) {
+    return 'Today';
+  }
+  if (isTomorrow(date)) {
+    return 'Tomorrow';
+  }
+  if (isYesterday(date)) {
+    return 'Yesterday';
+  }
+  return format(date, "d MMM yyyy");
+};
 
 const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -20,34 +36,6 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
     if (!editedTask.title) return;
     updateTask(task.id, editedTask);
     setIsEditing(false);
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    if (isToday(date)) {
-      return 'Today';
-    }
-    if (isYesterday(date)) {
-      return 'Yesterday';
-    }
-    return format(date, "d MMM yyyy");
-  };
-
-  const clearDate = (e) => {
-    e.preventDefault();
-    setEditedTask(prev => ({
-      ...prev,
-      dueDate: '',
-      dueTime: ''
-    }));
-  };
-
-  const clearTime = (e) => {
-    e.preventDefault();
-    setEditedTask(prev => ({
-      ...prev,
-      dueTime: ''
-    }));
   };
 
   const currentStatus = task.status;
@@ -75,7 +63,7 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
             />
             <button
               type="button"
-              className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing" // Changed from 'top-1/2 -translate-y-1/2' to 'top-2'
+              className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
               onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
               aria-label="Expand details"
             >
@@ -83,63 +71,14 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
             </button>
           </div>
 
-          <div className="grid grid-cols-[1.5fr,1.5fr,200px] gap-4">
-            <div>
-              <div className="relative flex items-center">
-                <input
-                  type="date"
-                  className="sr-only"
-                  value={editedTask.dueDate || ''}
-                  onChange={(e) => setEditedTask({...editedTask, dueDate: e.target.value})}
-                />
-                <div 
-                  className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
-                  onClick={() => document.querySelector('input[type="date"]').showPicker()}
-                >
-                  <span className="flex-grow">
-                    {editedTask.dueDate ? formatDate(editedTask.dueDate) : ''}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {editedTask.dueDate && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          clearDate(e);
-                        }}
-                        type="button"
-                        className="p-1 hover:bg-gray-100 rounded-full"
-                      >
-                        <X size={16} className="text-gray-500" />
-                      </button>
-                    )}
-                    <Calendar size={16} className="text-gray-500" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="relative">
-              <input
-                type="time"
-                placeholder="--:-- --"
-                className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors pr-16"
-                value={editedTask.dueTime || ''}
-                onChange={(e) => setEditedTask({...editedTask, dueTime: e.target.value})}
-                disabled={!editedTask.dueDate}
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                {editedTask.dueTime && (
-                  <button
-                    onClick={clearTime}
-                    type="button"
-                    className="p-1 hover:bg-gray-100 rounded-full"
-                  >
-                    <X size={16} className="text-gray-500" />
-                  </button>
-                )}
-                <Clock size={16} className="text-gray-500" />
-              </div>
-            </div>
+          <div className="grid grid-cols-[1fr,200px] gap-4">
+            <DateTimePicker
+              date={editedTask.dueDate}
+              time={editedTask.dueTime}
+              onDateChange={(date) => setEditedTask({...editedTask, dueDate: date})}
+              onTimeChange={(time) => setEditedTask({...editedTask, dueTime: time})}
+              isOverdue={isOverdue}
+            />
 
             <select
               value={editedTask.recurrence || 'none'}
@@ -273,7 +212,7 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
                     isOverdue ? 'text-red-500' : 'text-gray-500'
                   }`}>
                     <Clock size={14} />
-                    {formatDate(task.dueDate)}
+                    {formatDisplayDate(task.dueDate)}
                     {task.dueTime && ` at ${task.dueTime}`}
                   </span>
                 )}
