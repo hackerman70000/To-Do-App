@@ -43,9 +43,7 @@ function App() {
       const storedVersion = localStorage.getItem('tasksVersion');
       const savedTasks = localStorage.getItem('tasks');
       
-      if (!storedVersion || 
-          storedVersion !== CURRENT_VERSION || 
-          !savedTasks) {
+      if (!storedVersion || storedVersion !== CURRENT_VERSION || !savedTasks) {
         localStorage.removeItem('tasks');
         localStorage.removeItem('tasksVersion');
         localStorage.setItem('tasksVersion', CURRENT_VERSION);
@@ -183,9 +181,9 @@ function App() {
   }, [evaluateTaskStatuses]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Your tasks</h1>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-3xl mx-auto px-4">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Your tasks</h1>
         
         <TaskForm
           newTask={newTask}
@@ -200,16 +198,16 @@ function App() {
           updateTask={updateTask}
         />
         
-        <div className="mt-8 flex justify-center gap-4">
+        <div className="mt-6 flex justify-center gap-3">
           <button
             onClick={resetToInitialTasks}
-            className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+            className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
           >
             Reset to Default Tasks
           </button>
           <button
             onClick={() => setIsDeleteCompletedDialogOpen(true)}
-            className="px-4 py-2 text-sm bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors"
+            className="px-3 py-1.5 text-sm bg-red-100 hover:bg-red-200 text-red-700 rounded-md transition-colors"
           >
             Delete completed tasks
           </button>

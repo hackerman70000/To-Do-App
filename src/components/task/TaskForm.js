@@ -51,31 +51,31 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+    <div className="bg-white rounded-md shadow-sm border border-gray-200 mb-5">
       <div 
-        className="px-6 py-4 flex justify-between items-center cursor-pointer"
+        className="px-5 py-3 flex justify-between items-center cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <h2 className="text-xl font-semibold text-gray-800">Add task</h2>
+        <h2 className="text-lg font-semibold text-gray-800">Add task</h2>
         <button 
-          className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-1 hover:bg-gray-100 rounded-md transition-colors"
           aria-label={isExpanded ? "Collapse form" : "Expand form"}
         >
           {isExpanded ? (
-            <ChevronUp size={20} className="text-gray-500" />
+            <ChevronUp size={18} className="text-gray-500" />
           ) : (
-            <ChevronDown size={20} className="text-gray-500" />
+            <ChevronDown size={18} className="text-gray-500" />
           )}
         </button>
       </div>
 
       {isExpanded && (
-        <form onSubmit={handleSubmit} className="px-6 pb-4">
-          <div className="grid grid-cols-1 gap-4">
+        <form onSubmit={handleSubmit} className="px-5 pb-3">
+          <div className="grid grid-cols-1 gap-3">
             <input
               type="text"
               placeholder="Enter task title"
-              className="w-full px-3 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors h-[38px]"
+              className="w-full px-3 rounded-md border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors h-[34px]"
               value={newTask.title}
               onChange={(e) => setNewTask({...newTask, title: e.target.value})}
             />
@@ -84,21 +84,21 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
               <textarea
                 ref={textareaRef}
                 placeholder="Enter task details"
-                className="w-full px-3 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors resize-none overflow-hidden block"
+                className="w-full px-3 rounded-md border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors resize-none overflow-hidden block"
                 value={newTask.details}
                 onChange={(e) => setNewTask({...newTask, details: e.target.value})}
                 onKeyDown={handleKeyDown}
                 style={{ 
-                  height: `${Math.max(38, textareaRows * 24)}px`,
-                  minHeight: '38px',
-                  lineHeight: '38px',
+                  height: `${Math.max(34, textareaRows * 22)}px`,
+                  minHeight: '34px',
+                  lineHeight: '34px',
                   paddingTop: '0',
                   paddingBottom: '0'
                 }}
               />
             </div>
 
-            <div className="grid grid-cols-[1fr,200px] gap-4">
+            <div className="grid grid-cols-[1fr,180px] gap-3">
               <DateTimePicker
                 date={newTask.dueDate}
                 time={newTask.dueTime}
@@ -109,7 +109,7 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
               <select
                 value={newTask.recurrence || 'none'}
                 onChange={(e) => setNewTask({...newTask, recurrence: e.target.value})}
-                className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors bg-white"
+                className="w-full h-[34px] px-3 rounded-md border border-gray-300 focus:border-neutral-light focus:ring-2 focus:ring-neutral-light/20 outline-none transition-colors bg-white"
               >
                 <option value="none">No repeat</option>
                 <option value="daily">Daily</option>
@@ -118,13 +118,13 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
               </select>
             </div>
 
-            <div className="grid grid-cols-[1fr,200px] gap-4">
+            <div className="grid grid-cols-[1fr,180px] gap-3">
               <TagInput
                 tags={newTask.tags || []}
                 setTags={(tags) => setNewTask({...newTask, tags})}
               />
               
-              <div className="flex gap-2 items-center h-[38px]">
+              <div className="flex gap-2 items-center h-[34px]">
                 {['High', 'Medium', 'Low'].map((priority) => (
                   <button
                     key={priority}
@@ -136,7 +136,7 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
                         setNewTask({...newTask, priority: priority.toLowerCase()});
                       }
                     }}
-                    className={`px-3 py-1 rounded-full text-sm ${
+                    className={`px-2.5 py-0.5 rounded-full text-xs ${
                       newTask.priority === priority.toLowerCase()
                         ? priority === 'High'
                           ? 'bg-red-50 text-red-700'
@@ -155,9 +155,9 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="w-[200px] bg-neutral-light hover:bg-neutral-dark text-white h-[38px] rounded-lg flex items-center justify-center gap-2 transition-colors"
+                className="w-[180px] bg-neutral-light hover:bg-neutral-dark text-white h-[34px] rounded-md flex items-center justify-center gap-2 transition-colors"
               >
-                <Plus size={20} />
+                <Plus size={18} />
                 Add task
               </button>
             </div>
