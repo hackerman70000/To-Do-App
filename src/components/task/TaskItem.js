@@ -1,6 +1,6 @@
 import { format, isToday, isTomorrow, isYesterday } from 'date-fns';
 import { Check, Clock, Edit, GripVertical, Repeat, X } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { PRIORITY_LEVELS, RECURRENCE_PATTERNS } from '../../constants/taskConstants';
 import { DeleteConfirmDialog } from '../common/DeleteConfirmDialog';
 import { DateTimePicker } from './components/DateTimePicker';
@@ -21,6 +21,17 @@ const formatDisplayDate = (dateString) => {
   return format(date, "d MMM yyyy");
 };
 
+const determineTaskStatus = (task) => {
+  if (task.status === 'completed') return 'completed';
+  if (!task.dueDate) return 'in_progress';
+  
+  const dueDateTime = task.dueTime 
+    ? new Date(`${task.dueDate}T${task.dueTime}`)
+    : new Date(`${task.dueDate}T23:59:59`);
+    
+  return dueDateTime < new Date() ? 'overdue' : 'in_progress';
+};
+
 const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedTask, setEditedTask] = useState(task);
@@ -32,9 +43,33 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
     setIsEditing(true);
   };
 
+  const handleDateChange = useCallback((date) => {
+    const updatedTask = {
+      ...editedTask,
+      dueDate: date
+    };
+    updatedTask.status = determineTaskStatus(updatedTask);
+    setEditedTask(updatedTask);
+  }, [editedTask]);
+
+  const handleTimeChange = useCallback((time) => {
+    const updatedTask = {
+      ...editedTask,
+      dueTime: time
+    };
+    updatedTask.status = determineTaskStatus(updatedTask);
+    setEditedTask(updatedTask);
+  }, [editedTask]);
+
   const handleSave = () => {
     if (!editedTask.title) return;
-    updateTask(task.id, editedTask);
+    
+    const finalTask = {
+      ...editedTask,
+      status: determineTaskStatus(editedTask)
+    };
+    
+    updateTask(task.id, finalTask);
     setIsEditing(false);
   };
 
@@ -75,9 +110,9 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
             <DateTimePicker
               date={editedTask.dueDate}
               time={editedTask.dueTime}
-              onDateChange={(date) => setEditedTask({...editedTask, dueDate: date})}
-              onTimeChange={(time) => setEditedTask({...editedTask, dueTime: time})}
-              isOverdue={isOverdue}
+              onDateChange={handleDateChange}
+              onTimeChange={handleTimeChange}
+              isOverdue={editedTask.status === 'overdue'}
             />
 
             <select
