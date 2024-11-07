@@ -45,6 +45,18 @@ const validateTimeInput = (value) => {
   return timeRegex.test(value);
 };
 
+const formatTimeInput = (value) => {
+  const numbers = value.replace(/\D/g, '');
+  
+  if (numbers.length <= 2) {
+    return numbers;
+  }
+  
+  const hours = numbers.slice(0, 2);
+  const minutes = numbers.slice(2, 4);
+  return `${hours}:${minutes}`;
+};
+
 export const DateTimePicker = ({ 
   date, 
   time, 
@@ -57,6 +69,7 @@ export const DateTimePicker = ({
   const dateInputRef = useRef(null);
   const timePickerRef = useRef(null);
   const timeListRef = useRef(null);
+  const timeInputRef = useRef(null);
   const closestTime = getClosestTimeOption();
 
   useEffect(() => {
@@ -86,16 +99,31 @@ export const DateTimePicker = ({
   }, [showTimePicker, closestTime]);
 
   const handleTimeInputChange = (e) => {
-    const value = e.target.value;
-    setTimeInput(value);
+    const rawValue = e.target.value;
+    const formattedValue = formatTimeInput(rawValue);
+    setTimeInput(formattedValue);
     
-    if (validateTimeInput(value)) {
-      onTimeChange(value);
+    if (validateTimeInput(formattedValue)) {
+      onTimeChange(formattedValue);
+    }
+  };
+
+  const handleTimeInputKeyDown = (e) => {
+    if (e.key === 'Enter' && validateTimeInput(timeInput)) {
+      onTimeChange(timeInput);
+      setShowTimePicker(false);
+      timeInputRef.current?.blur();
     }
   };
 
   const handleDateClick = () => {
     dateInputRef.current?.showPicker();
+  };
+
+  const handleTimeClick = () => {
+    if (date) {
+      setShowTimePicker(true);
+    }
   };
 
   return (
@@ -140,24 +168,27 @@ export const DateTimePicker = ({
       
       <div className="relative" ref={timePickerRef}>
         <div 
-          className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center"
+          className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
+          onClick={handleTimeClick}
         >
           <input
+            ref={timeInputRef}
             type="text"
             placeholder="--:--"
             value={timeInput}
             onChange={handleTimeInputChange}
-            onClick={() => date && setShowTimePicker(true)}
+            onKeyDown={handleTimeInputKeyDown}
             className="flex-grow bg-transparent outline-none cursor-pointer"
+            maxLength={5}
           />
           <div className="flex items-center gap-1">
-            {time && (
+            {timeInput && (
               <button
                 onClick={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
                   onTimeChange('');
                   setTimeInput('');
-                  setShowTimePicker(false);
                 }}
                 type="button"
                 className="p-1 hover:bg-gray-100 rounded-full"
