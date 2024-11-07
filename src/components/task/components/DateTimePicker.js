@@ -128,7 +128,7 @@ export const DateTimePicker = ({
 
   return (
     <div className="grid grid-cols-[1.5fr,1.5fr] gap-4">
-      <div>
+      <div className="min-w-[160px]">
         <div className="relative flex items-center">
           <input
             ref={dateInputRef}
@@ -141,10 +141,10 @@ export const DateTimePicker = ({
             className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
             onClick={handleDateClick}
           >
-            <span className={`flex-grow ${isOverdue ? 'text-red-500' : ''}`}>
+            <span className={`flex-grow min-w-0 truncate ${isOverdue ? 'text-red-500' : ''}`}>
               {date ? formatDisplayDate(date) : 'Due date'}
             </span>
-            <div className="flex items-center gap-1 ml-2">
+            <div className="flex items-center gap-1 ml-2 flex-shrink-0">
               {date && (
                 <button
                   type="button"
@@ -166,7 +166,7 @@ export const DateTimePicker = ({
         </div>
       </div>
       
-      <div className="relative" ref={timePickerRef}>
+      <div className="relative min-w-[120px]" ref={timePickerRef}>
         <div 
           className="w-full h-[38px] px-3 rounded-lg border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer"
           onClick={handleTimeClick}
@@ -178,10 +178,10 @@ export const DateTimePicker = ({
             value={timeInput}
             onChange={handleTimeInputChange}
             onKeyDown={handleTimeInputKeyDown}
-            className="flex-grow bg-transparent outline-none cursor-pointer"
+            className="flex-grow min-w-0 bg-transparent outline-none cursor-pointer"
             maxLength={5}
           />
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-shrink-0">
             {timeInput && (
               <button
                 onClick={(e) => {
