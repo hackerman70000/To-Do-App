@@ -70,7 +70,7 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       setTasks(prevTasks => evaluateTaskStatuses(prevTasks));
-    }, 60000); // Check every minute
+    }, 60000);
     return () => clearInterval(interval);
   }, [evaluateTaskStatuses]);
 

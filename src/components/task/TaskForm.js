@@ -1,16 +1,53 @@
-import { ChevronDown, ChevronUp, GripVertical, Plus } from 'lucide-react';
-import React, { useState } from 'react';
+import { ChevronDown, ChevronUp, Plus } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DateTimePicker } from './components/DateTimePicker';
 import { TagInput } from './components/TagInput';
 
 const TaskForm = ({ newTask, setNewTask, addTask }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
+  const [textareaRows, setTextareaRows] = useState(1);
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (!newTask.details) {
+      setTextareaRows(1);
+    }
+  }, [newTask.details]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const cursorPosition = e.target.selectionStart;
+      const textBeforeCursor = e.target.value.substring(0, cursorPosition);
+      const textAfterCursor = e.target.value.substring(cursorPosition);
+      
+      const newText = textBeforeCursor + '\n' + textAfterCursor;
+      setNewTask({ ...newTask, details: newText });
+      
+      setTextareaRows(prev => prev + 1);
+      
+      setTimeout(() => {
+        e.target.selectionStart = cursorPosition + 1;
+        e.target.selectionEnd = cursorPosition + 1;
+      }, 0);
+    } else if (e.key === 'Backspace' && textareaRef.current) {
+      const lines = textareaRef.current.value.split('\n');
+      if (
+        e.target.selectionStart === e.target.selectionEnd &&
+        e.target.selectionStart > 0 &&
+        e.target.value[e.target.selectionStart - 1] === '\n' &&
+        lines.length > 1
+      ) {
+        setTextareaRows(prev => Math.max(1, prev - 1));
+      }
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!newTask.title) return;
     addTask();
+    setTextareaRows(1);
   };
 
   return (
@@ -38,26 +75,27 @@ const TaskForm = ({ newTask, setNewTask, addTask }) => {
             <input
               type="text"
               placeholder="Enter task title"
-              className="w-full p-2 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors h-[38px]"
+              className="w-full px-3 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors h-[38px]"
               value={newTask.title}
               onChange={(e) => setNewTask({...newTask, title: e.target.value})}
             />
             
             <div className="relative">
               <textarea
+                ref={textareaRef}
                 placeholder="Enter task details"
-                className={`w-full p-2 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors resize-none ${isDetailsExpanded ? 'h-24' : 'h-[38px]'}`}
+                className="w-full px-3 rounded-lg border border-gray-300 focus:border-neutral-focus-border focus:ring-2 focus:ring-neutral-focus-ring/30 outline-none transition-colors resize-none overflow-hidden block"
                 value={newTask.details}
                 onChange={(e) => setNewTask({...newTask, details: e.target.value})}
+                onKeyDown={handleKeyDown}
+                style={{ 
+                  height: `${Math.max(38, textareaRows * 24)}px`,
+                  minHeight: '38px',
+                  lineHeight: '38px',
+                  paddingTop: '0',
+                  paddingBottom: '0'
+                }}
               />
-              <button
-                type="button"
-                className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
-                onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
-                aria-label="Expand details"
-              >
-                <GripVertical size={16} />
-              </button>
             </div>
 
             <div className="grid grid-cols-[1fr,200px] gap-4">
