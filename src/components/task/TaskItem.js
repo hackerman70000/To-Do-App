@@ -53,7 +53,7 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
   }
 
   return (
-    <div className="bg-white rounded-md shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+    <div className="group bg-white rounded-md shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
         <button
           onClick={() => toggleTaskStatus(task.id)}
@@ -126,25 +126,21 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 ml-3">
-              {!isCompleted && (
-                <button
-                  className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
-                  onClick={() => setIsEditing(true)}
-                  aria-label="Edit task"
-                >
-                  <Edit size={14} />
-                </button>
-              )}
-              {(isCompleted || isOverdue) && (
-                <button
-                  className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
-                  onClick={() => setIsDeleteDialogOpen(true)}
-                  aria-label="Delete task"
-                >
-                  <X size={14} />
-                </button>
-              )}
+            <div className="flex items-center gap-2 ml-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
+                onClick={() => setIsEditing(true)}
+                aria-label="Edit task"
+              >
+                <Edit size={14} />
+              </button>
+              <button
+                className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
+                onClick={() => setIsDeleteDialogOpen(true)}
+                aria-label="Delete task"
+              >
+                <X size={14} />
+              </button>
             </div>
           </div>
         </div>
