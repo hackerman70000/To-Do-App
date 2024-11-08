@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 import TaskFormFields from './components/TaskFormFields';
 
 const TaskForm = ({ newTask, setNewTask, addTask }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!newTask.title) return;
     addTask();
+    setIsExpanded(false);
   };
 
   return (
