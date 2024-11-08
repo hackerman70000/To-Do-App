@@ -2,22 +2,25 @@ import React from 'react';
 import TaskItem from './TaskItem';
 
 const EmptyState = ({ filter }) => {
-  let message = "No tasks found";
+  let message = "You have no tasks yet";
   switch (filter) {
     case 'today':
-      message = "You have no tasks scheduled for today";
+      message = "Nothing planned for today";
       break;
     case 'tomorrow':
-      message = "You have no tasks scheduled for tomorrow";
+      message = "Nothing planned for tomorrow";
       break;
-    case 'week':
-      message = "You have no tasks scheduled for this week";
+    case 'upcoming':
+      message = "No upcoming tasks scheduled";
       break;
     case 'completed':
-      message = "You have no completed tasks";
+      message = "No completed tasks yet";
+      break;
+    case 'overdue':
+      message = "No overdue tasks";
       break;
     default:
-      message = "You have no tasks";
+      message = "You have no tasks yet";
   }
   return (
     <div className="text-center py-8">

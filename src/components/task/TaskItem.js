@@ -31,6 +31,14 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
     setIsEditing(false);
   };
 
+  const handleDelete = () => {
+    if (task.status === 'completed') {
+      deleteTask(task.id);
+    } else {
+      setIsDeleteDialogOpen(true);
+    }
+  };
+
   const currentStatus = task.status;
   const isCompleted = currentStatus === 'completed';
   const isOverdue = currentStatus === 'overdue';
@@ -136,7 +144,7 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
               </button>
               <button
                 className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
-                onClick={() => setIsDeleteDialogOpen(true)}
+                onClick={handleDelete}
                 aria-label="Delete task"
               >
                 <X size={14} />
@@ -146,14 +154,16 @@ const TaskItem = ({ task, toggleTaskStatus, deleteTask, updateTask }) => {
         </div>
       </div>
 
-      <DeleteConfirmDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        onConfirm={() => {
-          deleteTask(task.id);
-          setIsDeleteDialogOpen(false);
-        }}
-      />
+      {!isCompleted && (
+        <DeleteConfirmDialog
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          onConfirm={() => {
+            deleteTask(task.id);
+            setIsDeleteDialogOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };
