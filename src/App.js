@@ -71,25 +71,29 @@ function AppContent() {
 
   const filterTasks = useCallback((tasks, filter) => {
     if (!filter) return tasks;
-
+  
     if (filter === 'completed') {
       return tasks.filter(task => task.status === 'completed');
     }
-
-    const today = startOfDay(new Date());
+  
+    const now = new Date();
+    const today = startOfDay(now);
     const tomorrow = startOfDay(addDays(today, 1));
-
+  
     return tasks.filter(task => {
       if (!task.dueDate) return false;
       const taskDate = startOfDay(new Date(task.dueDate));
-
+      const isTaskOverdue = task.status === 'overdue';
+  
       switch (filter) {
+        case 'overdue':
+          return isTaskOverdue && !isEqual(taskDate, today);
         case 'today':
           return isEqual(taskDate, today);
         case 'tomorrow':
-          return isEqual(taskDate, tomorrow);
+          return isEqual(taskDate, tomorrow) && !isTaskOverdue;
         case 'upcoming':
-          return isAfter(taskDate, tomorrow);
+          return isAfter(taskDate, tomorrow) && !isTaskOverdue;
         default:
           return true;
       }
@@ -222,6 +226,7 @@ function AppContent() {
   }, [evaluateTaskStatuses]);
 
   const taskCounts = {
+    overdue: filterTasks(tasks, 'overdue').length,
     today: filterTasks(tasks, 'today').length,
     tomorrow: filterTasks(tasks, 'tomorrow').length,
     upcoming: filterTasks(tasks, 'upcoming').length,
@@ -298,6 +303,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/today" replace />} />
+        <Route path="/overdue" element={<AppContent />} />
         <Route path="/today" element={<AppContent />} />
         <Route path="/tomorrow" element={<AppContent />} />
         <Route path="/upcoming" element={<AppContent />} />

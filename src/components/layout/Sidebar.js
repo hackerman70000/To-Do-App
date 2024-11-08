@@ -1,20 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-const SidebarItem = ({ label, onClick, isActive, count }) => (
+const SidebarItem = ({ label, onClick, isActive, count, className = '' }) => (
   <div className="w-full px-3">
     <button
       onClick={onClick}
-      className={`w-full h-full flex items-center justify-between p-2 rounded-md transition-colors relative z-10 ${
+      className={`w-full flex items-center justify-between p-2 rounded-md transition-colors ${
         isActive 
           ? 'bg-gray-100 text-neutral-dark' 
-          : 'text-neutral-light hover:bg-gray-50'
+          : `text-neutral-light hover:bg-gray-50 ${className}`
       }`}
     >
-      <span className="text-sm font-normal pointer-events-none">
+      <span className={`text-sm font-normal ${className}`}>
         {label}
       </span>
       {count > 0 && (
-        <span className="text-xs text-gray-400 ml-2 pointer-events-none">
+        <span className={`text-xs ${isActive ? 'text-gray-400' : className || 'text-gray-400'} ml-2`}>
           {count}
         </span>
       )}
@@ -26,7 +26,8 @@ const Sidebar = ({ onFilterChange, currentFilter, taskCounts = {
   today: 5, 
   tomorrow: 2, 
   upcoming: 8,
-  completed: 15 
+  completed: 15,
+  overdue: 0 
 } }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef(null);
@@ -72,21 +73,41 @@ const Sidebar = ({ onFilterChange, currentFilter, taskCounts = {
   }, [isExpanded]);
 
   const items = [
-    { id: 'today', label: 'Today', count: taskCounts.today },
-    { id: 'tomorrow', label: 'Tomorrow', count: taskCounts.tomorrow },
-    { id: 'upcoming', label: 'Upcoming', count: taskCounts.upcoming },
-    { id: 'completed', label: 'Completed', count: taskCounts.completed }
+    { 
+      id: 'today', 
+      label: 'Today', 
+      count: taskCounts.today
+    },
+    { 
+      id: 'tomorrow', 
+      label: 'Tomorrow', 
+      count: taskCounts.tomorrow
+    },
+    { 
+      id: 'upcoming', 
+      label: 'Upcoming', 
+      count: taskCounts.upcoming
+    },
+    { 
+      id: 'completed', 
+      label: 'Completed', 
+      count: taskCounts.completed
+    },
+    { 
+      id: 'overdue', 
+      label: 'Overdue', 
+      count: taskCounts.overdue,
+      className: taskCounts.overdue > 0 ? 'text-red-600 hover:bg-red-50' : ''
+    }
   ];
 
   return (
     <>
-      {/* Hover trigger area */}
       <div 
         className="fixed left-0 top-0 w-[100px] h-screen bg-transparent z-30"
         role="presentation"
       />
       
-      {/* Menu toggle button */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={`fixed z-50 p-2 text-xl text-neutral-light hover:text-neutral-dark hover:bg-gray-100 rounded-md transition-all duration-300 ${
@@ -94,11 +115,11 @@ const Sidebar = ({ onFilterChange, currentFilter, taskCounts = {
             ? 'left-48'
             : 'left-4'
         }`}
+        aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
       >
         ≡
       </button>
       
-      {/* Sidebar content */}
       <div 
         ref={sidebarRef}
         className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-200 shadow-sm transition-all duration-300 overflow-hidden z-40 ${
@@ -106,13 +127,14 @@ const Sidebar = ({ onFilterChange, currentFilter, taskCounts = {
         }`}
       >
         <div className="mt-14 w-56">
-          <nav className="space-y-1 relative">
+          <nav className="space-y-1" role="navigation">
             {items.map((item) => (
               <SidebarItem
                 key={item.id}
                 label={item.label}
                 isActive={currentFilter === item.id}
                 count={item.count}
+                className={item.className}
                 onClick={() => {
                   onFilterChange(item.id);
                   setIsExpanded(false);
