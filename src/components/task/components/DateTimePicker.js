@@ -104,12 +104,20 @@ export const DateTimePicker = ({
     setTimeInput(formattedValue);
     
     if (validateTimeInput(formattedValue)) {
+      if (!date) {
+        const today = new Date().toISOString().split('T')[0];
+        onDateChange(today);
+      }
       onTimeChange(formattedValue);
     }
   };
 
   const handleTimeInputKeyDown = (e) => {
     if (e.key === 'Enter' && validateTimeInput(timeInput)) {
+      if (!date) {
+        const today = new Date().toISOString().split('T')[0];
+        onDateChange(today);
+      }
       onTimeChange(timeInput);
       setShowTimePicker(false);
       timeInputRef.current?.blur();
@@ -121,9 +129,21 @@ export const DateTimePicker = ({
   };
 
   const handleTimeClick = () => {
-    if (date) {
-      setShowTimePicker(true);
-    }
+    setShowTimePicker(true);
+  };
+
+  const handleClearDate = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDateChange('');
+  };
+
+  const handleClearTime = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onTimeChange('');
+    setTimeInput('');
+    setShowTimePicker(false);
   };
 
   return (
@@ -150,12 +170,7 @@ export const DateTimePicker = ({
                   type="button"
                   className="p-1 hover:bg-gray-100 rounded-full"
                   aria-label="Clear date"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    dateInputRef.current.value = '';
-                    onDateChange('');
-                  }}
+                  onClick={handleClearDate}
                 >
                   <X size={14} className="text-gray-500" />
                 </button>
@@ -184,12 +199,7 @@ export const DateTimePicker = ({
           <div className="flex items-center gap-1 flex-shrink-0">
             {timeInput && (
               <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onTimeChange('');
-                  setTimeInput('');
-                }}
+                onClick={handleClearTime}
                 type="button"
                 className="p-1 hover:bg-gray-100 rounded-full"
                 aria-label="Clear time"
@@ -201,7 +211,7 @@ export const DateTimePicker = ({
           </div>
         </div>
         
-        {showTimePicker && date && (
+        {showTimePicker && (
           <div 
             ref={timeListRef}
             className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg"
@@ -217,6 +227,10 @@ export const DateTimePicker = ({
                     isClosestTimeOption ? 'bg-gray-50 font-medium' : ''
                   }`}
                   onClick={() => {
+                    if (!date) {
+                      const today = new Date().toISOString().split('T')[0];
+                      onDateChange(today);
+                    }
                     onTimeChange(timeOption);
                     setTimeInput(timeOption);
                     setShowTimePicker(false);
