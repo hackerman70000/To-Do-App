@@ -66,11 +66,16 @@ export const DateTimePicker = ({
 }) => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [timeInput, setTimeInput] = useState(time || '');
+  const [localDate, setLocalDate] = useState(date || '');
   const dateInputRef = useRef(null);
   const timePickerRef = useRef(null);
   const timeListRef = useRef(null);
   const timeInputRef = useRef(null);
   const closestTime = getClosestTimeOption();
+
+  useEffect(() => {
+    setLocalDate(date || '');
+  }, [date]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -98,27 +103,28 @@ export const DateTimePicker = ({
     }
   }, [showTimePicker, closestTime]);
 
+  const handleTimeChange = (newTime) => {
+    if (!localDate) {
+      const today = new Date().toISOString().split('T')[0];
+      setLocalDate(today);
+      onDateChange(today);
+    }
+    onTimeChange(newTime);
+  };
+
   const handleTimeInputChange = (e) => {
     const rawValue = e.target.value;
     const formattedValue = formatTimeInput(rawValue);
     setTimeInput(formattedValue);
     
     if (validateTimeInput(formattedValue)) {
-      if (!date) {
-        const today = new Date().toISOString().split('T')[0];
-        onDateChange(today);
-      }
-      onTimeChange(formattedValue);
+      handleTimeChange(formattedValue);
     }
   };
 
   const handleTimeInputKeyDown = (e) => {
     if (e.key === 'Enter' && validateTimeInput(timeInput)) {
-      if (!date) {
-        const today = new Date().toISOString().split('T')[0];
-        onDateChange(today);
-      }
-      onTimeChange(timeInput);
+      handleTimeChange(timeInput);
       setShowTimePicker(false);
       timeInputRef.current?.blur();
     }
@@ -135,6 +141,7 @@ export const DateTimePicker = ({
   const handleClearDate = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    setLocalDate('');
     onDateChange('');
   };
 
@@ -154,18 +161,21 @@ export const DateTimePicker = ({
             ref={dateInputRef}
             type="date"
             className="sr-only"
-            value={date || ''}
-            onChange={(e) => onDateChange(e.target.value)}
+            value={localDate || ''}
+            onChange={(e) => {
+              setLocalDate(e.target.value);
+              onDateChange(e.target.value);
+            }}
           />
           <div 
             className="w-full h-[34px] px-3 rounded-md border border-gray-300 focus-within:border-neutral-light focus-within:ring-2 focus-within:ring-neutral-light/20 transition-colors bg-white flex items-center cursor-pointer text-sm"
             onClick={handleDateClick}
           >
             <span className={`flex-grow min-w-0 truncate ${isOverdue ? 'text-red-500' : ''}`}>
-              {date ? formatDisplayDate(date) : 'Due date'}
+              {localDate ? formatDisplayDate(localDate) : 'Due date'}
             </span>
             <div className="flex items-center gap-1 ml-2 flex-shrink-0">
-              {date && (
+              {localDate && (
                 <button
                   type="button"
                   className="p-1 hover:bg-gray-100 rounded-full"
@@ -227,11 +237,7 @@ export const DateTimePicker = ({
                     isClosestTimeOption ? 'bg-gray-50 font-medium' : ''
                   }`}
                   onClick={() => {
-                    if (!date) {
-                      const today = new Date().toISOString().split('T')[0];
-                      onDateChange(today);
-                    }
-                    onTimeChange(timeOption);
+                    handleTimeChange(timeOption);
                     setTimeInput(timeOption);
                     setShowTimePicker(false);
                   }}
