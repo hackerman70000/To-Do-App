@@ -239,6 +239,7 @@ function AppContent() {
         onFilterChange={(filter) => navigate(`/${filter}`)} 
         currentFilter={currentFilter}
         taskCounts={taskCounts}
+        onResetTasks={resetToInitialTasks}
       />
       
       <div className="pl-14 transition-all">
@@ -265,24 +266,14 @@ function AppContent() {
             filter={currentFilter}
           />
           
-          {filteredTasks.length > 0 && (
-            <div className="mt-6 flex justify-center gap-3">
-              {currentFilter !== 'completed' && (
-                <button
-                  onClick={resetToInitialTasks}
-                  className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                >
-                  Reset to Default Tasks
-                </button>
-              )}
-              {currentFilter === 'completed' && (
-                <button
-                  onClick={() => setIsDeleteCompletedDialogOpen(true)}
-                  className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-                >
-                  Delete completed tasks
-                </button>
-              )}
+          {filteredTasks.length > 0 && currentFilter === 'completed' && (
+            <div className="mt-6 flex justify-center">
+              <button
+                onClick={() => setIsDeleteCompletedDialogOpen(true)}
+                className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              >
+                Delete completed tasks
+              </button>
             </div>
           )}
 
@@ -297,6 +288,7 @@ function AppContent() {
     </div>
   );
 }
+
 
 function App() {
   return (

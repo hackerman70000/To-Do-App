@@ -28,7 +28,7 @@ const Sidebar = ({ onFilterChange, currentFilter, taskCounts = {
   upcoming: 8,
   completed: 15,
   overdue: 0 
-} }) => {
+}, onResetTasks }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -120,30 +120,50 @@ const Sidebar = ({ onFilterChange, currentFilter, taskCounts = {
         ≡
       </button>
       
-      <div 
+      <aside 
         ref={sidebarRef}
-        className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-200 shadow-sm transition-all duration-300 overflow-hidden z-40 ${
+        className={`fixed left-0 top-0 h-screen bg-white border-r border-gray-200 shadow-sm transition-all duration-300 z-40 ${
           isExpanded ? 'w-56' : 'w-0'
         }`}
       >
-        <div className="mt-14 w-56">
-          <nav className="space-y-1" role="navigation">
-            {items.map((item) => (
-              <SidebarItem
-                key={item.id}
-                label={item.label}
-                isActive={currentFilter === item.id}
-                count={item.count}
-                className={item.className}
-                onClick={() => {
-                  onFilterChange(item.id);
-                  setIsExpanded(false);
-                }}
-              />
-            ))}
-          </nav>
+        <div className={`absolute inset-0 flex flex-col w-56 transition-transform duration-300 ${
+          isExpanded ? 'translate-x-0' : '-translate-x-full'
+        }`}>
+          {/* Top section with navigation */}
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className="mt-14">
+              <nav className="space-y-1" role="navigation">
+                {items.map((item) => (
+                  <SidebarItem
+                    key={item.id}
+                    label={item.label}
+                    isActive={currentFilter === item.id}
+                    count={item.count}
+                    className={item.className}
+                    onClick={() => {
+                      onFilterChange(item.id);
+                      setIsExpanded(false);
+                    }}
+                  />
+                ))}
+              </nav>
+            </div>
+          </div>
+          
+          {/* Bottom section with reset button */}
+          <div className="flex-shrink-0 p-3 border-t border-gray-200">
+            <button
+              onClick={() => {
+                onResetTasks();
+                setIsExpanded(false);
+              }}
+              className="w-full px-3 py-2 text-sm text-gray-600 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors"
+            >
+              Reset to Default Tasks
+            </button>
+          </div>
         </div>
-      </div>
+      </aside>
     </>
   );
 };
