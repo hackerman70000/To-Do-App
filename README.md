@@ -2,7 +2,7 @@
 
 A modern, feature-rich task management application built with React. Organize your daily tasks, set priorities, track due dates, and manage recurring responsibilities with an intuitive user interface. For now it is frontend only.
 
-https://github.com/hackerman70000/To-Do-App/images/video/to-do-app_video.mov
+![Video](https://github.com/hackerman70000/To-Do-App/images/video/to-do-app_video.mov)
 
 ## Features
 
